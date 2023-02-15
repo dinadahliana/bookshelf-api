@@ -102,9 +102,99 @@ const getBookById = (request, h) => {
   return response;
 };
 
+const editBookByIdHandler = (request, h) => {
+  const {id} = request.params;
+
+  const {
+    name,
+    year,
+    author,
+    summary,
+    publisher,
+    pageCount,
+    readPage,
+    reading,
+  } = request.payload;
+
+  const updatedAt = new Date().toISOString();
+
+  const index = books.findIndex((book) => book.id === id);
+  const isSuccess = name !== '' && readPage <= pageCount;
+
+  if (index !== -1 & isSuccess) {
+    books[index] = {
+      ...books[index],
+      name,
+      year,
+      author,
+      summary,
+      publisher,
+      pageCount,
+      readPage,
+      reading,
+      updatedAt,
+    };
+    const response = h.response({
+      status: 'success',
+      message: 'Buku berhasill diperbarui',
+    });
+    response.code(200);
+    return response;
+  } else {
+    if (name === '') {
+      const response = h.response({
+        status: 'fail',
+        message: 'Gagal memperbarui buku. Mohon isi nama buku',
+      });
+      response.code(400);
+      return response;
+    } else if (readPage > pageCount) {
+      const response = h.response({
+        status: 'fail',
+        message: `Gagal memperbarui buku. 
+            readPage tidak boleh lebih besar dari pageCount`,
+      });
+      response.code(400);
+      return response;
+    } else {
+      const response = h.response({
+        status: 'fail',
+        message: 'Gagal memperbarui buku. Id tidak ditemukan',
+      });
+      response.code(404);
+      return response;
+    }
+  }
+};
+
+const deleteBookByIdHandler = (request, h) => {
+  const {id} = request.id;
+
+  const index = books.findIndex((book) => book.Id === id);
+
+  if (index !== -1) {
+    books.splice(index, 1);
+
+    const response = h.response({
+      status: 'success',
+      message: 'Buku berhasil dihapus',
+    });
+    response.code(200);
+    return response;
+  };
+
+  const response = h.response({
+    status: 'fail',
+    message: 'Buku gagal dihapus. Id tidak ditemukan'
+  });
+  response.code(404);
+  return response;
+};
 
 module.exports = {
   addBooksHandler,
   getAllBooksHandler,
   getBookById,
+  editBookByIdHandler,
+  deleteBookByIdHandler,
 };
