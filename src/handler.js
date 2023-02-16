@@ -1,4 +1,5 @@
 const {nanoid} = require('nanoid');
+const books = require('./books.js');
 
 const addBooksHandler = (request, h) => {
   const {
@@ -185,7 +186,7 @@ const deleteBookByIdHandler = (request, h) => {
 
   const response = h.response({
     status: 'fail',
-    message: 'Buku gagal dihapus. Id tidak ditemukan'
+    message: 'Buku gagal dihapus. Id tidak ditemukan',
   });
   response.code(404);
   return response;
