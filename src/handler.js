@@ -58,8 +58,8 @@ const addBooksHandler = (request, h) => {
     } else if (readPage > pageCount) {
       const response = h.response({
         status: 'fail',
-        message: `Gagal menambahkan buku. 
-        readPage tidak boleh lebih besar dari pageCount`,
+        // eslint-disable-next-line max-len
+        message: `Gagal menambahkan buku. readPage tidak boleh lebih besar dari pageCount`,
       });
       response.code(400);
       return response;
@@ -73,6 +73,7 @@ const addBooksHandler = (request, h) => {
     };
   };
 };
+;
 
 const getAllBooksHandler = () => ({
   status: 'succes',
@@ -81,14 +82,14 @@ const getAllBooksHandler = () => ({
   },
 });
 
-const getBookById = (request, h) => {
+const getBookByIdHandler = (request, h) => {
   const {id} = request.params;
 
   const book = books.filter((b) => b.id === id)[0];
 
   if (book !== undefined) {
     return {
-      status: 'succes',
+      status: 'success',
       data: {
         book,
       },
@@ -195,7 +196,7 @@ const deleteBookByIdHandler = (request, h) => {
 module.exports = {
   addBooksHandler,
   getAllBooksHandler,
-  getBookById,
+  getBookByIdHandler,
   editBookByIdHandler,
   deleteBookByIdHandler,
 };
