@@ -1,4 +1,4 @@
-const { nanoid } = require('nanoid');
+const {nanoid} = require('nanoid');
 const books = require('./books.js');
 
 const addBooksHandler = (request, h) => {
@@ -84,15 +84,23 @@ const addBooksHandler = (request, h) => {
 };
 
 
-const getAllBooksHandler = (request, h) => ({
-  status: 'succes',
-  data: {
-    books,
-  },
-});
+const getAllBooksHandler = (request, h) => {
+  const response = h.response({
+    status: 'success',
+    data: {
+      books: books.map((book) => ({
+        id: book.id,
+        name: book.name,
+        publisher: book.publisher,
+      })),
+    },
+  });
+  response.code(200);
+  return response;
+};
 
 const getBookByIdHandler = (request, h) => {
-  const { bookId } = request.params;
+  const {bookId} = request.params;
 
   const book = books.filter((b) => b.id === bookId)[0];
 
@@ -114,7 +122,7 @@ const getBookByIdHandler = (request, h) => {
 };
 
 const editBookByIdHandler = (request, h) => {
-  const { id } = request.params;
+  const {bookId} = request.params;
 
   const {
     name,
