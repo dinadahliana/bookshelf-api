@@ -1,4 +1,4 @@
-const {nanoid} = require('nanoid');
+const { nanoid } = require('nanoid');
 const books = require('./books.js');
 
 const addBooksHandler = (request, h) => {
@@ -18,24 +18,50 @@ const addBooksHandler = (request, h) => {
   const insertedAt = new Date().toISOString();
   const updatedAt = insertedAt;
 
-  const newBooks = {
-    id,
-    name,
-    year,
-    author,
-    summary,
-    publisher,
-    pageCount,
-    readPage,
-    finished,
-    reading,
-    insertedAt,
-    updatedAt,
+  //   kriteria: harus melampirkan properti name, readPage <= pageCount
+  //   client tidak melampirkan properti name pada body request
+  if (name === '') {
+    const response = h.response({
+      status: 'fail',
+      message: `Gagal menambahkan buku. Mohon isi nama buku`,
+    });
+    response.code(400);
+    return response;
   };
 
-  books.push(newBooks);
+  /*   client melampirkan properti readPage lebih besar
+       dari nilai properti pageCount */
+  if (readPage > pageCount) {
+    const response = h.response({
+      status: 'fail',
+      message: 'Gagal menambahkan buku. readPage tidak boleh lebih besar dari pageCount',
+    });
+    response.code(400);
+    return response;
+  };
 
-  const isSuccess = name !== '' && readPage <= pageCount;
+  const isPassed = name !== '' && readPage <= pageCount;
+
+  if (isPassed) {
+    const newBooks = {
+      id,
+      name,
+      year,
+      author,
+      summary,
+      publisher,
+      pageCount,
+      readPage,
+      finished,
+      reading,
+      insertedAt,
+      updatedAt,
+    };
+
+    books.push(newBooks);
+  };
+
+  const isSuccess = books.filter((book) => book.id === id).length > 0;
 
   if (isSuccess) {
     const response = h.response({
@@ -47,35 +73,18 @@ const addBooksHandler = (request, h) => {
     });
     response.code(201);
     return response;
-  } else {
-    if (name === '') {
-      const response = h.response({
-        status: 'fail',
-        message: 'Gagal menambahkan buku. Mohon isi nama buku',
-      });
-      response.code(400);
-      return response;
-    } else if (readPage > pageCount) {
-      const response = h.response({
-        status: 'fail',
-        // eslint-disable-next-line max-len
-        message: `Gagal menambahkan buku. readPage tidak boleh lebih besar dari pageCount`,
-      });
-      response.code(400);
-      return response;
-    } else {
-      const response = h.response({
-        status: 'error',
-        message: 'Buku gagal ditambahkan',
-      });
-      response.code(500);
-      return response;
-    };
   };
-};
-;
 
-const getAllBooksHandler = () => ({
+  const response = h.response({
+    status: 'error',
+    message: 'Buku gagal ditambahkan',
+  });
+  response.code(500);
+  return response;
+};
+
+
+const getAllBooksHandler = (request, h) => ({
   status: 'succes',
   data: {
     books,
@@ -83,9 +92,9 @@ const getAllBooksHandler = () => ({
 });
 
 const getBookByIdHandler = (request, h) => {
-  const {id} = request.params;
+  const { bookId } = request.params;
 
-  const book = books.filter((b) => b.id === id)[0];
+  const book = books.filter((b) => b.id === bookId)[0];
 
   if (book !== undefined) {
     return {
@@ -105,7 +114,7 @@ const getBookByIdHandler = (request, h) => {
 };
 
 const editBookByIdHandler = (request, h) => {
-  const {id} = request.params;
+  const { id } = request.params;
 
   const {
     name,
